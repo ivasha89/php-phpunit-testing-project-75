@@ -1,0 +1,24 @@
+{
+    "name": "hexlet/code",
+    "description": "page loader testing project",
+    "type": "project",
+    "require": {
+        "guzzlehttp/guzzle": "7.9.x-dev",
+        "phpunit/phpunit": "10.5.x-dev"
+    },
+    "require-dev": {
+        "guzzlehttp/guzzle": "7.9.x-dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hexlet\\Code\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Okunev Ivan",
+            "email": "okunevia@elocont.ru"
+        }
+    ],
+    "minimum-stability": "dev"
+}
