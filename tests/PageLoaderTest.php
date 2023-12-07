@@ -1,0 +1,151 @@
+<?php
+
+use bovigo\vfs\vfsStream;
+use DiDom\Document;
+use DiDom\Exceptions\InvalidSelectorException;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Hexlet\Code\PageLoader;
+use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
+
+class PageLoaderTest extends TestCase
+{
+    private $html;
+
+    private $client;
+
+    private $clientResponse;
+
+    private $root;
+
+    /**
+     * @return void
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    protected function setUp(): void
+    {
+        vfsStream::setup('var', 0777);
+
+        $this->html = '/www-youtube-com.html';
+        $content = file_get_contents(__DIR__ . $this->html);
+
+        $this->client = $this->createMock(Client::class);
+        $this->clientResponse = $this->createMock(ResponseInterface::class);
+        $message = $this->createMock(StreamInterface::class);
+        $this->client->method('get')->willReturn($this->clientResponse);
+        $this->client->method('request')->willReturn($this->clientResponse);
+        $this->clientResponse->method('getBody')->willReturn($message);
+        $message->method('getContents')->willReturn($content);
+    }
+
+    /**
+     * @return void
+     * @throws GuzzleException
+     * @throws InvalidSelectorException
+     */
+    public function testInputUrl()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Empty url');
+        $params = ['url' => '', 'path' => '', 'client' => ''];
+        $loader = new PageLoader($params);
+        $loader->execute();
+    }
+
+    /**
+     * @return void
+     * @throws GuzzleException
+     * @throws InvalidSelectorException
+     */
+    public function testInputPathParam()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Empty path for page saving');
+        $params = ['url' => 'https://www.google.com', 'path' => '', 'client' => ''];
+        $loader = new PageLoader($params);
+        $loader->execute();
+    }
+
+    /**
+     * @return void
+     * @throws GuzzleException
+     * @throws InvalidSelectorException
+     */
+    public function testPageStatusFalseCode()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Page status code is: 500. Aborting');
+        $this->clientResponse->method('getStatusCode')->willReturn(500);
+        $params = ['url' => 'https://www.google.com', 'path' => '/any/path', 'client' => $this->client];
+        $loader = new PageLoader($params);
+        $loader->execute();
+    }
+
+    /**
+     * @return void
+     * @throws GuzzleException
+     * @throws InvalidSelectorException
+     * @throws Exception
+     */
+    public function testLoader()
+    {
+        $url = 'https://www.youtube.com';
+        $directory_path = vfsStream::url('var');
+        $path = $directory_path . '/tmp';
+        mkdir($path, 0777, true);
+
+        $this->clientResponse->method('getStatusCode')->willReturn(200);
+        $this->client->expects($this->once())->method('get')->with($this->equalTo($url));
+
+        $params = ['url' => $url, 'path' => $path, 'client' => $this->client];
+        $loader = new PageLoader($params);
+        $loader->execute();
+
+        $dom_document = new Document( __DIR__ . $this->html, true);
+        $this->assertFileExists($path . $this->html);
+        $images = $dom_document->find("img");
+        $scripts = $dom_document->find("script");
+        $files = array_merge($scripts, $images);
+        foreach ($files as $file) {
+            $file_url = $file->getAttribute('src');
+            if (!str_contains($file_url, 'https')) {
+                 $this->assertFileExists($path . '/' . $file_url);
+            }
+        }
+
+        $links = $dom_document->find('link');
+        foreach ($links as $link) {
+            $href = $link->getAttribute('href');
+            if (
+                pathinfo($url, PATHINFO_EXTENSION)
+                && !str_ends_with($href, '/')
+                && !str_contains($href, '@')
+                && !str_contains($href, 'https')
+            ) {
+                $this->assertFileExists($path . '/' . $href);
+            }
+
+        }
+    }
+
+    /**
+     * @return void
+     * @throws GuzzleException
+     * @throws InvalidSelectorException
+     */
+    public function testSavingFileError()
+    {
+        $this->expectException(Exception::class);
+        $url = 'https://www.youtube.com';
+        $path = '/tzar';
+
+        $this->clientResponse->method('getStatusCode')->willReturn(200);
+        $this->client->expects($this->once())->method('get')->with($this->equalTo($url));
+
+        $params = ['url' => $url, 'path' => $path, 'client' => $this->client];
+        $loader = new PageLoader($params);
+        $loader->execute();
+    }
+}
