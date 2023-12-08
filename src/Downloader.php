@@ -1,13 +1,12 @@
 <?php
 
-namespace Hexlet\Code;
+namespace Downloader;
 
 use DiDom\Exceptions\InvalidSelectorException;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use DiDom\Document;
-use GuzzleHttp\RequestOptions;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
