@@ -12,7 +12,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
 
-class PageLoader
+class Downloader
 {
     protected $url;
 
@@ -55,7 +55,7 @@ class PageLoader
      * @throws InvalidSelectorException
      * @throws Exception
      */
-    public function execute(): string
+    public function downloadPage(): string
     {
         $loader = $this->client;
         $get_content = $loader->get($this->url);

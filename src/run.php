@@ -20,7 +20,7 @@ try {
 
     // Создаём экземпляр класса, передав параметры и вызываем метод execute()
     $class = new $className($params);
-    $class->execute();
+    $class->downloadPage();
 } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage();
 }
