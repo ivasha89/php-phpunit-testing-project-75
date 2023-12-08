@@ -6,7 +6,7 @@ try {
     unset($argv[0]);
 
     // Составляем полное имя класса, добавив нэймспейс
-    $className = '\\Hexlet\\Code\\' . array_shift($argv);
+    $className = '\\Downloader\\' . array_shift($argv);
 
     foreach ($argv as $argument) {
         preg_match('/^-(.+)=(.+)$/', $argument, $matches);
