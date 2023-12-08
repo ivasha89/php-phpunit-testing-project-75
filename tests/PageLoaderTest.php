@@ -1,11 +1,11 @@
 <?php
 
-use bovigo\vfs\vfsStream;
 use DiDom\Document;
 use DiDom\Exceptions\InvalidSelectorException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Hexlet\Code\PageLoader;
+use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -110,7 +110,7 @@ class PageLoaderTest extends TestCase
         $files = array_merge($scripts, $images);
         foreach ($files as $file) {
             $file_url = $file->getAttribute('src');
-            if (!str_contains($file_url, 'https')) {
+            if (!strpos($file_url, 'https')) {
                  $this->assertFileExists($path . '/' . $file_url);
             }
         }
@@ -120,9 +120,9 @@ class PageLoaderTest extends TestCase
             $href = $link->getAttribute('href');
             if (
                 pathinfo($url, PATHINFO_EXTENSION)
-                && !str_ends_with($href, '/')
-                && !str_contains($href, '@')
-                && !str_contains($href, 'https')
+                && !(substr($href, -1) !== '/')
+                && !strpos($href, '@')
+                && !strpos($href, 'https')
             ) {
                 $this->assertFileExists($path . '/' . $href);
             }

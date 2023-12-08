@@ -14,19 +14,19 @@ use Monolog\Logger;
 
 class PageLoader
 {
-    protected string $url;
+    protected $url;
 
-    protected string $domain_url;
+    protected $domain_url;
 
-    protected string $path;
+    protected $path;
 
-    protected mixed $client;
+    protected $client;
 
-    protected string $content_url;
+    protected $content_url;
 
-    protected string $files_directory;
+    protected $files_directory;
 
-    protected Logger $logger;
+    protected $logger;
 
     /**
      * @throws Exception
@@ -125,12 +125,12 @@ class PageLoader
      * @return mixed|string
      * @throws Exception
      */
-    public function checkUrl($url, $content): mixed
+    public function checkUrl($url, $content)
     {
         if (
-            str_contains($url, $this->domain_url)
-            && !str_ends_with($url, '/')
-            && !str_contains($url, '@')
+            strpos($url, $this->domain_url)
+            && (!substr($url,  -1) !== '/')
+            && !strpos($url, '@')
         ) {
             if (pathinfo($url, PATHINFO_EXTENSION)) {
                 $url_array = explode('//', $url);
@@ -139,9 +139,9 @@ class PageLoader
                 }
             }
         } elseif (
-            !str_contains($url,'http')
-            && !str_contains($url,'.com')
-            && !str_contains($url,'@')
+            !strpos($url,'http')
+            && !strpos($url,'.com')
+            && !strpos($url,'@')
         ) {
             if (pathinfo($url, PATHINFO_EXTENSION)) {
                 $content = $this->saveFile($url, $content, 'local');
