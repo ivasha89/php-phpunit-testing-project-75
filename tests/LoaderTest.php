@@ -2,7 +2,6 @@
 
 use DiDom\Document;
 use DiDom\Exceptions\InvalidSelectorException;
-use Downloader\Downloader\Downloader;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Hexlet\Code\Loader;
