@@ -2,15 +2,16 @@
 
 use DiDom\Document;
 use DiDom\Exceptions\InvalidSelectorException;
+use Downloader\Downloader\Downloader;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Downloader\Downloader;
+use Hexlet\Code\Loader;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class DownloaderTest extends TestCase
+class LoaderTest extends TestCase
 {
     private $html;
 
@@ -50,8 +51,8 @@ class DownloaderTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Empty url');
         $params = ['url' => '', 'path' => '', 'client' => ''];
-        $loader = new Downloader($params);
-        $loader->downloadPage();
+        $loader = new Loader($params);
+        $loader->load();
     }
 
     /**
@@ -64,8 +65,8 @@ class DownloaderTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Empty path for page saving');
         $params = ['url' => 'https://www.google.com', 'path' => '', 'client' => ''];
-        $loader = new Downloader($params);
-        $loader->downloadPage();
+        $loader = new Loader($params);
+        $loader->load();
     }
 
     /**
@@ -79,8 +80,8 @@ class DownloaderTest extends TestCase
         $this->expectExceptionMessage('Page status code is: 500. Aborting');
         $this->clientResponse->method('getStatusCode')->willReturn(500);
         $params = ['url' => 'https://www.google.com', 'path' => '/any/path', 'client' => $this->client];
-        $loader = new Downloader($params);
-        $loader->downloadPage();
+        $loader = new Loader($params);
+        $loader->load();
     }
 
     /**
@@ -100,8 +101,8 @@ class DownloaderTest extends TestCase
         $this->client->expects($this->once())->method('get')->with($this->equalTo($url));
 
         $params = ['url' => $url, 'path' => $path, 'client' => $this->client];
-        $loader = new Downloader($params);
-        $loader->downloadPage();
+        $loader = new Loader($params);
+        $loader->load();
 
         $dom_document = new Document( __DIR__ . $this->html, true);
         $this->assertFileExists($path . $this->html);
@@ -145,7 +146,7 @@ class DownloaderTest extends TestCase
         $this->client->expects($this->once())->method('get')->with($this->equalTo($url));
 
         $params = ['url' => $url, 'path' => $path, 'client' => $this->client];
-        $loader = new Downloader($params);
-        $loader->downloadPage();
+        $loader = new Loader($params);
+        $loader->load();
     }
 }

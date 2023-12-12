@@ -1,6 +1,6 @@
 <?php
 
-namespace Downloader;
+namespace Hexlet\Code;
 
 use DiDom\Exceptions\InvalidSelectorException;
 use Exception;
@@ -11,7 +11,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
 
-class Downloader
+class Loader
 {
     protected $url;
 
@@ -54,7 +54,7 @@ class Downloader
      * @throws InvalidSelectorException
      * @throws Exception
      */
-    public function downloadPage(): string
+    public function load(): string
     {
         $loader = $this->client;
         $get_content = $loader->get($this->url);
