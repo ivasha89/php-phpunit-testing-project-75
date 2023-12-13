@@ -13,6 +13,8 @@ use Monolog\Logger;
 
 class Loader
 {
+    protected $user;
+
     protected $url;
 
     protected $domain_url;
@@ -39,8 +41,8 @@ class Loader
         $parse = parse_url($this->url);
         $this->domain_url = $parse['host'];
         $this->path = $params['path'];
-        $user = posix_getpwuid(posix_geteuid());
-        chown($this->path, $user['name']);
+        $this->user = posix_getpwuid(posix_geteuid());
+
         if (empty($this->path)) {
             throw new Exception('Empty path for page saving');
         }
@@ -74,10 +76,10 @@ class Loader
         // сохраняем изображения
         $this->files_directory = $this->path . '/' . $this->content_url . '_files';
         if (!file_exists($this->files_directory)) {
-            if (is_writable($this->files_directory)) {
-                mkdir($this->files_directory, 0770, true);
-            } else {
-                throw new Exception('No permission for saving to path: ' . $this->files_directory);
+            mkdir($this->files_directory, 0770, true);
+            chown($this->files_directory, $this->user['name']);
+            if (!is_writable($this->files_directory)) {
+                throw new Exception('No permission to create path: ' . $this->files_directory);
             }
         } else {
             fwrite(STDERR, 'File directory ' . $this->files_directory . ' exists' . PHP_EOL);
@@ -167,11 +169,7 @@ class Loader
         $replace_url = $this->createPath($url);
         try {
             $new_url_to_save = $this->files_directory . '/' . $replace_url;
-            if (is_writable($new_url_to_save)) {
-                file_put_contents($new_url_to_save, file_get_contents('https://' . $url_to_load));
-            } else {
-                throw new Exception('No permission to save to this directory');
-            }
+            file_put_contents($new_url_to_save, file_get_contents('https://' . $url_to_load));
 
             $new_url_to_replace = $this->content_url . '_files' . '/' . $replace_url;
             $searched_url = $url_type === 'https' ? 'https://' . $url : $url;
