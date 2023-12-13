@@ -17,7 +17,7 @@ if (! function_exists( 'Downloader\Downloader\downloadPage')) {
      * @throws GuzzleException
      * @throws Exception
      */
-    function downloadPage(string $url, ?string $targetPath, string $clientClass): bool
+    function downloadPage(string $url, ?string $targetPath, $clientClass): bool
     {
 
         $targetDir = $targetPath ?? getcwd();
