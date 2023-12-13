@@ -111,12 +111,12 @@ class Loader
         // сохраняем страницу
         $file_name = $this->content_url . '.html';
         $path = $this->path . '/' . $file_name;
-        if (is_writable($path)) {
+        try {
             file_put_contents($path, $content);
-        } else {
-            $message = 'No permission to save to path: ' . $path;
+        } catch (Exception $e) {
+            $message = 'Error: ' . $e->getMessage();
             fwrite(STDERR, $message . PHP_EOL);
-            throw new Exception($message);
+            throw $e;
         }
 
         return 'true';
