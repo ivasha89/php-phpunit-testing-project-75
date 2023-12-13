@@ -40,7 +40,6 @@ class LoaderTest extends TestCase
         $this->client->method('get')->willReturn($this->clientResponse);
         $this->client->method('request')->willReturn($this->clientResponse);
         $this->clientResponse->method('getBody')->willReturn($message);
-        $this->clientResponse->method('getStatusCode')->willReturn(200);
         $message->method('getContents')->willReturn($content);
     }
 
@@ -72,20 +71,20 @@ class LoaderTest extends TestCase
         $loader->load();
     }
 
-    /**
-     * @return void
-     * @throws GuzzleException
-     * @throws InvalidSelectorException
-     */
-    public function testPageStatusFalseCode()
-    {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Page status code is: 500. Aborting');
-        $this->clientResponse->method('getStatusCode')->willReturn(500);
-        $params = ['url' => 'https://www.google.com', 'path' => '/any/path', 'client' => $this->client];
-        $loader = new Loader($params);
-        $loader->load();
-    }
+//    /**
+//     * @return void
+//     * @throws GuzzleException
+//     * @throws InvalidSelectorException
+//     */
+//    public function testPageStatusFalseCode()
+//    {
+//        $this->expectException(Exception::class);
+//        $this->expectExceptionMessage('Page status code is: 500. Aborting');
+//        $this->clientResponse->method('getStatusCode')->willReturn(500);
+//        $params = ['url' => 'https://www.google.com', 'path' => '/any/path', 'client' => $this->client];
+//        $loader = new Loader($params);
+//        $loader->load();
+//    }
 
     /**
      * @return void
@@ -100,7 +99,7 @@ class LoaderTest extends TestCase
         $path = $directory_path . '/tmp';
         mkdir($path, 0777, true);
 
-        $this->clientResponse->method('getStatusCode')->willReturn(200);
+//        $this->clientResponse->method('getStatusCode')->willReturn(200);
         $this->client->expects($this->once())->method('get')->with($this->equalTo($url));
 
         $params = ['url' => $url, 'path' => $path, 'client' => $this->client];
@@ -145,7 +144,7 @@ class LoaderTest extends TestCase
         $url = 'https://www.youtube.com';
         $path = '/tzar';
 
-        $this->clientResponse->method('getStatusCode')->willReturn(200);
+//        $this->clientResponse->method('getStatusCode')->willReturn(200);
         $this->client->expects($this->once())->method('get')->with($this->equalTo($url));
 
         $params = ['url' => $url, 'path' => $path, 'client' => $this->client];

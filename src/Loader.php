@@ -58,12 +58,12 @@ class Loader
     {
         $loader = $this->client;
         $get_content = $loader->get($this->url);
-        if ($get_content->getStatusCode() !== 200) {
-            fwrite(STDERR, $get_content->getReasonPhrase() . PHP_EOL);
-            throw new Exception('Page status code is: ' . $get_content->getStatusCode() . '. Aborting');
-        } else {
+//        if ($get_content->getStatusCode() !== 200) {
+//            fwrite(STDERR, $get_content->getReasonPhrase() . PHP_EOL);
+//            throw new Exception('Page status code is: ' . $get_content->getStatusCode() . '. Aborting');
+//        } else {
             $content = $get_content->getBody()->getContents();
-        }
+//        }
         $document = new Document($this->url, true);
 
         // создание префикса имён
