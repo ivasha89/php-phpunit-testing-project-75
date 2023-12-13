@@ -15,7 +15,10 @@
         "psr-4": {
             "Hexlet\\Code\\": "src/",
             "Hexlet\\Code\\Tests\\": "tests/"
-        }
+        },
+        "files": [
+            "extra/function.php"
+        ]
     },
     "authors": [
         {
@@ -23,8 +26,5 @@
             "email": "okunevia@elocont.ru"
         }
     ],
-    "minimum-stability": "stable",
-    "files": [
-        "extra/function.php"
-    ]
+    "minimum-stability": "stable"
 }
