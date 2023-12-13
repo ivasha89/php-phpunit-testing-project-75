@@ -46,7 +46,7 @@ class Loader
         $parse = parse_url($this->url);
         $this->domain_url = $parse['host'];
         $this->url_scheme = $parse['scheme'];
-        $this->url_page_path = $parse['path'];
+        $this->url_page_path = !empty($parse['path']) ? $parse['path'] : '';
 
         $this->path = $params['path'];
         $this->user = posix_getpwuid(posix_geteuid());
@@ -126,7 +126,7 @@ class Loader
         $file_name = $this->content_url . '.html';
         $path = $this->path . '/' . $file_name;
         try {
-            str_replace(' /', '', $content);
+            str_replace('"·/>', '">', $content);
             str_replace('</html>\n', '</html>', $content);
             file_put_contents($path, $content);
         } catch (Exception $e) {
@@ -148,7 +148,7 @@ class Loader
     public function checkUrl($url, $content)
     {
         if (
-            stripos($url, $this->url_scheme . '://' . $this->domain_url)
+            stripos($url, $this->url_scheme . '://' . $this->domain_url) === 0
             && (!substr($url,  -1) != '/')
             && !stripos($url, '@')
         ) {
