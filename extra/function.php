@@ -23,11 +23,7 @@ if (! function_exists( 'Downloader\Downloader\downloadPage')) {
 
         $targetDir = $targetPath ?? getcwd();
 
-        /**
-         * @var Client $client
-         */
-        $client = new $clientClass();
-        $params = ['url' => $url, 'path' => $targetDir, 'client' => $client];
+        $params = ['url' => $url, 'path' => $targetDir, 'client' => $clientClass];
         $loader = new Loader($params);
 
         return $loader->load();

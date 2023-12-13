@@ -46,7 +46,7 @@ class Loader
         if (empty($this->path)) {
             throw new Exception('Empty path for page saving');
         }
-        $this->client = !empty($params['client']) ? $params['client'] : new Client();
+        $this->client = !empty($params['client']) ? new $params['client']() : new Client();
 
         $this->logger = new Logger('pageLoader');
         $this->logger->pushHandler(new StreamHandler('../loader.log', Level::Warning));
@@ -62,12 +62,12 @@ class Loader
     {
         $loader = $this->client;
         $get_content = $loader->get($this->url);
-//        if ($get_content->getStatusCode() !== 200) {
-//            fwrite(STDERR, $get_content->getReasonPhrase() . PHP_EOL);
-//            throw new Exception('Page status code is: ' . $get_content->getStatusCode() . '. Aborting');
-//        } else {
+        if ($get_content->getStatusCode() !== 200) {
+            fwrite(STDERR, $get_content->getReasonPhrase() . PHP_EOL);
+            throw new Exception('Page status code is: ' . $get_content->getStatusCode() . '. Aborting');
+        } else {
             $content = $get_content->getBody()->getContents();
-//        }
+        }
         $document = new Document($this->url, true);
 
         // создание префикса имён
