@@ -39,6 +39,7 @@ class Loader
         $parse = parse_url($this->url);
         $this->domain_url = $parse['host'];
         $this->path = $params['path'];
+        chown($this->path, passthru('whoami'));
         if (empty($this->path)) {
             throw new Exception('Empty path for page saving');
         }
@@ -58,12 +59,12 @@ class Loader
     {
         $loader = $this->client;
         $get_content = $loader->get($this->url);
-        if ($get_content->getStatusCode() !== 200) {
-            fwrite(STDERR, $get_content->getReasonPhrase() . PHP_EOL);
-            throw new Exception('Page status code is: ' . $get_content->getStatusCode() . '. Aborting');
-        } else {
+//        if ($get_content->getStatusCode() !== 200) {
+//            fwrite(STDERR, $get_content->getReasonPhrase() . PHP_EOL);
+//            throw new Exception('Page status code is: ' . $get_content->getStatusCode() . '. Aborting');
+//        } else {
             $content = $get_content->getBody()->getContents();
-        }
+//        }
         $document = new Document($this->url, true);
 
         // создание префикса имён

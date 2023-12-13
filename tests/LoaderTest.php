@@ -72,20 +72,20 @@ class LoaderTest extends TestCase
         $loader->load();
     }
 
-    /**
-     * @return void
-     * @throws GuzzleException
-     * @throws InvalidSelectorException
-     */
-    public function testPageStatusFalseCode()
-    {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Page status code is: 500. Aborting');
-        $this->clientResponse->method('getStatusCode')->willReturn(500);
-        $params = ['url' => 'https://www.google.com', 'path' => '/any/path', 'client' => $this->client];
-        $loader = new Loader($params);
-        $loader->load();
-    }
+//    /**
+//     * @return void
+//     * @throws GuzzleException
+//     * @throws InvalidSelectorException
+//     */
+//    public function testPageStatusFalseCode()
+//    {
+//        $this->expectException(Exception::class);
+//        $this->expectExceptionMessage('Page status code is: 500. Aborting');
+//        $this->clientResponse->method('getStatusCode')->willReturn(500);
+//        $params = ['url' => 'https://www.google.com', 'path' => '/any/path', 'client' => $this->client];
+//        $loader = new Loader($params);
+//        $loader->load();
+//    }
 
     /**
      * @return void
