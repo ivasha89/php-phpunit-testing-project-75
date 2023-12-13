@@ -7,6 +7,7 @@ use DiDom\Exceptions\InvalidSelectorException;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Response;
 use Hexlet\Code\Loader;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
@@ -29,13 +30,13 @@ class LoaderTest extends TestCase
      */
     protected function setUp(): void
     {
-        vfsStream::setup('var', 0777);
+        vfsStream::setup('var', 0770);
 
         $this->html = '/www-youtube-com.html';
         $content = file_get_contents(__DIR__ . $this->html);
 
         $this->client = $this->createMock(Client::class);
-        $this->clientResponse = $this->createMock(ResponseInterface::class);
+        $this->clientResponse = $this->createMock(Response::class);
         $message = $this->createMock(StreamInterface::class);
         $this->client->method('get')->willReturn($this->clientResponse);
         $this->client->method('request')->willReturn($this->clientResponse);
@@ -71,20 +72,20 @@ class LoaderTest extends TestCase
         $loader->load();
     }
 
-//    /**
-//     * @return void
-//     * @throws GuzzleException
-//     * @throws InvalidSelectorException
-//     */
-//    public function testPageStatusFalseCode()
-//    {
-//        $this->expectException(Exception::class);
-//        $this->expectExceptionMessage('Page status code is: 500. Aborting');
-//        $this->clientResponse->method('getStatusCode')->willReturn(500);
-//        $params = ['url' => 'https://www.google.com', 'path' => '/any/path', 'client' => $this->client];
-//        $loader = new Loader($params);
-//        $loader->load();
-//    }
+    /**
+     * @return void
+     * @throws GuzzleException
+     * @throws InvalidSelectorException
+     */
+    public function testPageStatusFalseCode()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Page status code is: 500. Aborting');
+        $this->clientResponse->method('getStatusCode')->willReturn(500);
+        $params = ['url' => 'https://www.google.com', 'path' => '/any/path', 'client' => $this->client];
+        $loader = new Loader($params);
+        $loader->load();
+    }
 
     /**
      * @return void
@@ -97,9 +98,9 @@ class LoaderTest extends TestCase
         $url = 'https://www.youtube.com';
         $directory_path = vfsStream::url('var');
         $path = $directory_path . '/tmp';
-        mkdir($path, 0777, true);
+        mkdir($path, 0770, true);
 
-//        $this->clientResponse->method('getStatusCode')->willReturn(200);
+        $this->clientResponse->method('getStatusCode')->willReturn(200);
         $this->client->expects($this->once())->method('get')->with($this->equalTo($url));
 
         $params = ['url' => $url, 'path' => $path, 'client' => $this->client];
@@ -144,7 +145,7 @@ class LoaderTest extends TestCase
         $url = 'https://www.youtube.com';
         $path = '/tzar';
 
-//        $this->clientResponse->method('getStatusCode')->willReturn(200);
+        $this->clientResponse->method('getStatusCode')->willReturn(200);
         $this->client->expects($this->once())->method('get')->with($this->equalTo($url));
 
         $params = ['url' => $url, 'path' => $path, 'client' => $this->client];

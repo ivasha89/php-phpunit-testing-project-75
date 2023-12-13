@@ -58,12 +58,12 @@ class Loader
     {
         $loader = $this->client;
         $get_content = $loader->get($this->url);
-//        if ($get_content->getStatusCode() !== 200) {
-//            fwrite(STDERR, $get_content->getReasonPhrase() . PHP_EOL);
-//            throw new Exception('Page status code is: ' . $get_content->getStatusCode() . '. Aborting');
-//        } else {
+        if ($get_content->getStatusCode() !== 200) {
+            fwrite(STDERR, $get_content->getReasonPhrase() . PHP_EOL);
+            throw new Exception('Page status code is: ' . $get_content->getStatusCode() . '. Aborting');
+        } else {
             $content = $get_content->getBody()->getContents();
-//        }
+        }
         $document = new Document($this->url, true);
 
         // создание префикса имён
@@ -72,11 +72,11 @@ class Loader
         // сохраняем изображения
         $this->files_directory = $this->path . '/' . $this->content_url . '_files';
         if (!file_exists($this->files_directory)) {
-//            if (is_writable($this->files_directory)) {
-                mkdir($this->files_directory, 0777, true);
-//            } else {
-//                throw new Exception('No permission for saving to path: ' . $this->files_directory);
-//            }
+            if (is_writable($this->files_directory)) {
+                mkdir($this->files_directory, 0770, true);
+            } else {
+                throw new Exception('No permission for saving to path: ' . $this->files_directory);
+            }
         } else {
             fwrite(STDERR, 'File directory ' . $this->files_directory . ' exists' . PHP_EOL);
         }
