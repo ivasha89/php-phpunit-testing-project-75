@@ -40,6 +40,7 @@ class LoaderTest extends TestCase
         $this->client->method('get')->willReturn($this->clientResponse);
         $this->client->method('request')->willReturn($this->clientResponse);
         $this->clientResponse->method('getBody')->willReturn($message);
+        $this->clientResponse->method('getStatusCode')->willReturn(200);
         $message->method('getContents')->willReturn($content);
     }
 
