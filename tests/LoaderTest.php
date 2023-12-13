@@ -1,7 +1,10 @@
 <?php
 
+namespace Hexlet\Code\Tests;
+
 use DiDom\Document;
 use DiDom\Exceptions\InvalidSelectorException;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Hexlet\Code\Loader;

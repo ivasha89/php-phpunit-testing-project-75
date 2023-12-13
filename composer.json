@@ -13,7 +13,8 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "Hexlet\\Code\\": "src/"
+            "Hexlet\\Code\\": "src/",
+            "Hexlet\\Code\\Tests\\": "tests/"
         }
     },
     "authors": [
