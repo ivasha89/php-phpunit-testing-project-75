@@ -7,6 +7,7 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use DiDom\Document;
+use GuzzleHttp\Psr7\Utils;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
@@ -62,12 +63,12 @@ class Loader
     {
         $loader = $this->client;
         $get_content = $loader->get($this->url);
-        if ($get_content->getStatusCode() !== 200) {
-            fwrite(STDERR, $get_content->getReasonPhrase() . PHP_EOL);
-            throw new Exception('Page status code is: ' . $get_content->getStatusCode() . '. Aborting');
-        } else {
+//        if ($get_content->getStatusCode() !== 200) {
+//            fwrite(STDERR, $get_content->getReasonPhrase() . PHP_EOL);
+//            throw new Exception('Page status code is: ' . $get_content->getStatusCode() . '. Aborting');
+//        } else {
             $content = $get_content->getBody()->getContents();
-        }
+//        }
         $document = new Document($this->url, true);
 
         // создание префикса имён
@@ -132,7 +133,7 @@ class Loader
     {
         if (
             strpos($url, $this->domain_url)
-            && (!substr($url,  -1) !== '/')
+            && (!substr($url,  -1) != '/')
             && !strpos($url, '@')
         ) {
             if (pathinfo($url, PATHINFO_EXTENSION)) {
@@ -169,7 +170,7 @@ class Loader
         $replace_url = $this->createPath($url);
         try {
             $new_url_to_save = $this->files_directory . '/' . $replace_url;
-            file_put_contents($new_url_to_save, file_get_contents('https://' . $url_to_load));
+            $this->client->request('GET', 'https://' . $url_to_load, ['sink' => $new_url_to_save]);
 
             $new_url_to_replace = $this->content_url . '_files' . '/' . $replace_url;
             $searched_url = $url_type === 'https' ? 'https://' . $url : $url;
