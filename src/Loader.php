@@ -81,10 +81,6 @@ class Loader
         // создание префикса имён
         $this->content_url = $this->createPath($this->url, 'directory');
 
-        // путь для сохранения файла html
-        $file_name = $this->content_url . '.html';
-        $path = $this->path . '/' . $file_name;
-
         // сохраняем изображения
         $this->files_directory = $this->path . '/' . $this->content_url . '_files';
         if (!file_exists($this->files_directory)) {
@@ -108,7 +104,10 @@ class Loader
             $link_href = $link->getAttribute('href');
             if (!empty($link_href)) {
                 if ($link_href === $this->url_page_path) {
-                    $content = str_replace($link_href, $path, $content);
+                    $content = str_replace(
+                        $link_href,
+                        $this->content_url . '_files/' . $this->content_url . '.html',
+                        $content);
                 } else {
                     $content = $this->checkUrl($link_href, $content);
                 }
@@ -124,7 +123,11 @@ class Loader
 
 
         // сохраняем страницу
+        $file_name = $this->content_url . '.html';
+        $path = $this->path . '/' . $file_name;
         try {
+            str_replace(' /', '', $content);
+            str_replace('</html>\n', '</html>', $content);
             file_put_contents($path, $content);
         } catch (Exception $e) {
             $message = 'Error: ' . $e->getMessage();
@@ -145,7 +148,7 @@ class Loader
     public function checkUrl($url, $content)
     {
         if (
-            strripos($url, $this->url_scheme . './/' . $this->domain_url)
+            stripos($url, $this->url_scheme . '://' . $this->domain_url)
             && (!substr($url,  -1) != '/')
             && !stripos($url, '@')
         ) {
