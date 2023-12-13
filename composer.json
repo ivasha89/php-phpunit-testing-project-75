@@ -22,5 +22,8 @@
             "email": "okunevia@elocont.ru"
         }
     ],
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "files": [
+        "extra/function.php"
+    ]
 }
