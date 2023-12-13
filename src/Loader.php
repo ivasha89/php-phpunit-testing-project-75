@@ -172,11 +172,14 @@ class Loader
             $this->client->request('GET', 'https://' . $url_to_load, []);
         } catch (Exception $e) {
             if (stripos($e->getMessage(), 'Not found URL')) {
-                if (stripos($this->url, 'https://')) {
-                    $url_to_load = $this->url . $url;
+                $url_to_load = $this->url . $url;
+                if (stripos($url_to_load, 'https://')) {
                     $replace_url = $this->createPath(str_replace('https://', '', $url_to_load));
                 }
             }
+        }
+        if (!stripos($url_to_load, 'https://')) {
+            $url_to_load = 'https://' . $url_to_load;
         }
         try {
             $new_url_to_save = $this->files_directory . '/' . $replace_url;
