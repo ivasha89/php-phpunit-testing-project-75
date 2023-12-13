@@ -72,11 +72,11 @@ class Loader
         // сохраняем изображения
         $this->files_directory = $this->path . '/' . $this->content_url . '_files';
         if (!file_exists($this->files_directory)) {
-            if (is_writable($this->files_directory)) {
+//            if (is_writable($this->files_directory)) {
                 mkdir($this->files_directory, 0777, true);
-            } else {
-                throw new Exception('No permission for saving to path: ' . $this->files_directory);
-            }
+//            } else {
+//                throw new Exception('No permission for saving to path: ' . $this->files_directory);
+//            }
         } else {
             fwrite(STDERR, 'File directory ' . $this->files_directory . ' exists' . PHP_EOL);
         }
