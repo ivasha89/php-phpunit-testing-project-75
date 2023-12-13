@@ -169,21 +169,14 @@ class Loader
         $url_to_load = $url_type === 'https' ? $url : $this->domain_url . $url;
         $replace_url = $this->createPath($url);
         try {
-            $this->client->request('GET', 'https://' . $url_to_load, []);
-        } catch (Exception $e) {
-            if (stripos($e->getMessage(), 'Not found URL')) {
-                $url_to_load = $this->url . $url;
-                if (stripos($url_to_load, 'https://')) {
-                    $replace_url = $this->createPath(str_replace('https://', '', $url_to_load));
+            $new_url_to_save = $this->files_directory . '/' . $replace_url;
+            try {
+                $this->client->request('GET', 'https://' . $url_to_load, ['sink' => $new_url_to_save]);
+            } catch (Exception $e) {
+                if (strpos($e->getMessage(), 'Not found URL')) {
+                    $this->client->request('GET', $this->url . $url, ['sink' => $new_url_to_save]);
                 }
             }
-        }
-        if (!stripos($url_to_load, 'https://')) {
-            $url_to_load = 'https://' . $url_to_load;
-        }
-        try {
-            $new_url_to_save = $this->files_directory . '/' . $replace_url;
-            $this->client->request('GET', $url_to_load, ['sink' => $new_url_to_save]);
 
             $new_url_to_replace = $this->content_url . '_files' . '/' . $replace_url;
             $searched_url = $url_type === 'https' ? 'https://' . $url : $url;
