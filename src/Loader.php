@@ -7,7 +7,6 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use DiDom\Document;
-use GuzzleHttp\Psr7\Utils;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
@@ -126,8 +125,8 @@ class Loader
         $file_name = $this->content_url . '.html';
         $path = $this->path . '/' . $file_name;
         try {
-            str_replace('"·/>', '">', $content);
-            str_replace('</html>\n', '</html>', $content);
+            str_replace('" />', '">', $content);
+            str_replace('</html>' . PHP_EOL, '</html>', $content);
             file_put_contents($path, $content);
         } catch (Exception $e) {
             $message = 'Error: ' . $e->getMessage();
@@ -195,7 +194,7 @@ class Loader
             }
 
             $new_url_to_replace = $this->content_url . '_files' . '/' . $replace_url;
-            $searched_url = $url_type === 'https' ? 'https://' . $url : $url;
+            $searched_url = $url_type === 'http' ? $this->url_scheme . '://' . $url : $url;
             $content = str_replace($searched_url, $new_url_to_replace, $content);
         } catch (Exception $e) {
             $this->logger->error('Error: ' . $e->getMessage());

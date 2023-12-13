@@ -94,7 +94,7 @@ class LoaderTest extends TestCase
      */
     public function testLoader()
     {
-        $url = 'https://www.youtube.com';
+        $url = 'http://site.com/blog/about';
         $directory_path = vfsStream::url('var');
         $path = $directory_path . '/tmp';
         $user = posix_getpwuid(posix_geteuid());
