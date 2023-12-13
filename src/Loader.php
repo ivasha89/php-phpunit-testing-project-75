@@ -20,6 +20,8 @@ class Loader
 
     protected $domain_url;
 
+    protected $url_scheme;
+
     protected $path;
 
     protected $client;
@@ -41,6 +43,7 @@ class Loader
         }
         $parse = parse_url($this->url);
         $this->domain_url = $parse['host'];
+        $this->url_scheme = $parse['scheme'];
         $this->path = $params['path'];
         $this->user = posix_getpwuid(posix_geteuid());
 
@@ -132,7 +135,7 @@ class Loader
     public function checkUrl($url, $content)
     {
         if (
-            stripos($url, $this->domain_url)
+            strripos($url, $this->url_scheme . './/' . $this->domain_url)
             && (!substr($url,  -1) != '/')
             && !stripos($url, '@')
         ) {
@@ -164,14 +167,14 @@ class Loader
      * @return string
      * @throws Exception
      */
-    public function saveFile($url, $content, string $url_type = 'https'): string
+    public function saveFile($url, $content, string $url_type = 'http'): string
     {
-        $url_to_load = $url_type === 'https' ? $url : $this->domain_url . $url;
+        $url_to_load = $url_type === 'http' ? $url : $this->domain_url . $url;
         $replace_url = $this->createPath($url_to_load);
         try {
             $new_url_to_save = $this->files_directory . '/' . $replace_url;
             try {
-                $this->client->request('GET', 'https://' . $url_to_load, ['sink' => $new_url_to_save]);
+                $this->client->request('GET', $this->url_scheme . '://' . $url_to_load, ['sink' => $new_url_to_save]);
             } catch (Exception $e) {
                 if (strpos($e->getMessage(), 'Not found URL')) {
                     $this->client->request('GET', $this->url . $url, ['sink' => $new_url_to_save]);
