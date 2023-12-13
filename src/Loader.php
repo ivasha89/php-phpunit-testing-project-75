@@ -172,11 +172,11 @@ class Loader
         } catch (Exception $e) {
             if (stripos($e->getMessage(), 'Not found URL')) {
                 if (stripos($this->url, 'https://')) {
-                    $url_to_load = str_replace('https://', '', $this->url) . $url;
+                    $url_to_load = $this->url . $url;
                 }
             }
         }
-        $replace_url = $this->createPath($url_to_load);
+        $replace_url = $this->createPath(str_replace('https://', '', $url_to_load));
         try {
             $new_url_to_save = $this->files_directory . '/' . $replace_url;
             $this->client->request('GET', $url_to_load, ['sink' => $new_url_to_save]);
