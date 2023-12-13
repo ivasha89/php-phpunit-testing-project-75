@@ -42,7 +42,7 @@ class Loader
         if (empty($this->path)) {
             throw new Exception('Empty path for page saving');
         }
-        $this->client = $params['client'] ?? new Client();
+        $this->client = !empty($params['client']) ? $params['client'] : new Client();
 
         $this->logger = new Logger('pageLoader');
         $this->logger->pushHandler(new StreamHandler('../loader.log', Level::Warning));

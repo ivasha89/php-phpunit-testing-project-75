@@ -4,6 +4,7 @@ namespace Downloader\Downloader;
 
 use DiDom\Exceptions\InvalidSelectorException;
 use Exception;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Hexlet\Code\Loader;
 
@@ -17,12 +18,16 @@ if (! function_exists( 'Downloader\Downloader\downloadPage')) {
      * @throws GuzzleException
      * @throws Exception
      */
-    function downloadPage(string $url, ?string $targetPath, $clientClass): bool
+    function downloadPage(string $url, ?string $targetPath, string $clientClass): bool
     {
 
         $targetDir = $targetPath ?? getcwd();
 
-        $params = ['url' => $url, 'path' => $targetDir, 'client' => $clientClass];
+        /**
+         * @var Client $client
+         */
+        $client = new $clientClass();
+        $params = ['url' => $url, 'path' => $targetDir, 'client' => $client];
         $loader = new Loader($params);
 
         return $loader->load();
