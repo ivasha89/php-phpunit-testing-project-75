@@ -168,7 +168,7 @@ class Loader
     {
         $url_to_load = $url_type === 'https' ? $url : $this->domain_url . $url;
         try {
-            $this->client->request('GET', 'https://' . $url_to_load);
+            $this->client->request('GET', 'https://' . $url_to_load, []);
         } catch (Exception $e) {
             if (stripos($e->getMessage(), 'Not found URL')) {
                 if (stripos($this->url, 'https://')) {
