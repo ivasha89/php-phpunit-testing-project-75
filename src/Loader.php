@@ -170,7 +170,13 @@ class Loader
         $replace_url = $this->createPath($url);
         try {
             $new_url_to_save = $this->files_directory . '/' . $replace_url;
-            $this->client->request('GET', 'https://' . $url_to_load, ['sink' => $new_url_to_save]);
+            try {
+                $this->client->request('GET', 'https://' . $url_to_load, ['sink' => $new_url_to_save]);
+            } catch (Exception $e) {
+                if (strpos($e->getMessage(), 'Not found URL')) {
+                    $this->client->request('GET', $this->url . $url, ['sink' => $new_url_to_save]);
+                }
+            }
 
             $new_url_to_replace = $this->content_url . '_files' . '/' . $replace_url;
             $searched_url = $url_type === 'https' ? 'https://' . $url : $url;
