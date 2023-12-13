@@ -22,6 +22,8 @@ class Loader
 
     protected $url_scheme;
 
+    protected $url_page_path;
+
     protected $path;
 
     protected $client;
@@ -44,6 +46,8 @@ class Loader
         $parse = parse_url($this->url);
         $this->domain_url = $parse['host'];
         $this->url_scheme = $parse['scheme'];
+        $this->url_page_path = $parse['path'];
+
         $this->path = $params['path'];
         $this->user = posix_getpwuid(posix_geteuid());
 
@@ -77,6 +81,10 @@ class Loader
         // создание префикса имён
         $this->content_url = $this->createPath($this->url, 'directory');
 
+        // путь для сохранения файла html
+        $file_name = $this->content_url . '.html';
+        $path = $this->path . '/' . $file_name;
+
         // сохраняем изображения
         $this->files_directory = $this->path . '/' . $this->content_url . '_files';
         if (!file_exists($this->files_directory)) {
@@ -99,7 +107,11 @@ class Loader
         foreach ($links as $link) {
             $link_href = $link->getAttribute('href');
             if (!empty($link_href)) {
-                $content = $this->checkUrl($link_href, $content);
+                if ($link_href === $this->url_page_path) {
+                    $content = str_replace($link_href, $path, $content);
+                } else {
+                    $content = $this->checkUrl($link_href, $content);
+                }
             }
         }
         $scripts = $document->find("script");
@@ -112,8 +124,6 @@ class Loader
 
 
         // сохраняем страницу
-        $file_name = $this->content_url . '.html';
-        $path = $this->path . '/' . $file_name;
         try {
             file_put_contents($path, $content);
         } catch (Exception $e) {
