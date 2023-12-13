@@ -143,7 +143,7 @@ class Loader
                 }
             }
         } elseif (
-            !stripos($url,'http')
+            !stripos($url,'://')
             && !stripos($url,'.com')
             && !stripos($url,'@')
         ) {
@@ -167,7 +167,7 @@ class Loader
     public function saveFile($url, $content, string $url_type = 'https'): string
     {
         $url_to_load = $url_type === 'https' ? $url : $this->domain_url . $url;
-        $replace_url = $this->createPath($url);
+        $replace_url = $this->createPath($url_to_load);
         try {
             $new_url_to_save = $this->files_directory . '/' . $replace_url;
             try {
