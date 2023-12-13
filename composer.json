@@ -8,7 +8,8 @@
         "php": ">=7.3.0",
         "mikey179/vfsstream": ">=1.6.11",
         "imangazaliev/didom": "2.0.1",
-        "monolog/monolog": "3.5.0"
+        "monolog/monolog": "3.5.0",
+        "ext-posix": "*"
     },
     "prefer-stable": true,
     "autoload": {

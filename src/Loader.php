@@ -39,7 +39,8 @@ class Loader
         $parse = parse_url($this->url);
         $this->domain_url = $parse['host'];
         $this->path = $params['path'];
-        chown($this->path, passthru('whoami'));
+        $user = posix_getpwuid(posix_geteuid());
+        chown($this->path, $user);
         if (empty($this->path)) {
             throw new Exception('Empty path for page saving');
         }
