@@ -40,7 +40,7 @@ class Loader
         $this->domain_url = $parse['host'];
         $this->path = $params['path'];
         $user = posix_getpwuid(posix_geteuid());
-        chown($this->path, $user);
+        chown($this->path, $user['name']);
         if (empty($this->path)) {
             throw new Exception('Empty path for page saving');
         }
