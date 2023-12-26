@@ -17,19 +17,19 @@ class Loader
 
     protected $url;
 
-    protected $domain_url;
+    protected $domainUrl;
 
-    protected $url_scheme;
+    protected $urlScheme;
 
-    protected $url_page_path;
+    protected $urlPagePath;
 
     protected $path;
 
     protected $client;
 
-    protected $content_url;
+    protected $contentUrl;
 
-    protected $files_directory;
+    protected $filesDirectory;
 
     protected $logger;
 
@@ -43,9 +43,9 @@ class Loader
             throw new Exception('Empty url');
         }
         $parse = parse_url($this->url);
-        $this->domain_url = $parse['host'];
-        $this->url_scheme = $parse['scheme'];
-        $this->url_page_path = !empty($parse['path']) ? $parse['path'] : '';
+        $this->domainUrl = $parse['host'];
+        $this->urlScheme = $parse['scheme'];
+        $this->urlPagePath = !empty($parse['path']) ? $parse['path'] : '';
 
         $this->path = $params['path'];
         $this->user = posix_getpwuid(posix_geteuid());
@@ -53,7 +53,7 @@ class Loader
         if (empty($this->path)) {
             throw new Exception('Empty path for page saving');
         }
-        $this->client = !empty($params['client']) ? new $params['client']() : new Client();
+        $this->client = $params['client'];
 
         $this->logger = new Logger('pageLoader');
         $this->logger->pushHandler(new StreamHandler('../loader.log', Level::Warning));
@@ -68,65 +68,56 @@ class Loader
     public function load(): string
     {
         $loader = $this->client;
-        $get_content = $loader->get($this->url);
-//        if ($get_content->getStatusCode() !== 200) {
-//            fwrite(STDERR, $get_content->getReasonPhrase() . PHP_EOL);
-//            throw new Exception('Page status code is: ' . $get_content->getStatusCode() . '. Aborting');
-//        } else {
-            $content = $get_content->getBody()->getContents();
-//        }
+        $content = $loader->get($this->url)->getBody()->getContents();
         $document = new Document($this->url, true);
 
         // создание префикса имён
-        $this->content_url = $this->createPath($this->url, 'directory');
+        $this->contentUrl = $this->createPath($this->url, 'directory');
 
         // сохраняем изображения
-        $this->files_directory = $this->path . '/' . $this->content_url . '_files';
-        if (!file_exists($this->files_directory)) {
-            mkdir($this->files_directory, 0770, true);
-            chown($this->files_directory, $this->user['name']);
-            if (!is_writable($this->files_directory)) {
-                throw new Exception('No permission to create path: ' . $this->files_directory);
+        $this->filesDirectory = $this->path . '/' . $this->contentUrl . '_files';
+        if (!file_exists($this->filesDirectory)) {
+            mkdir($this->filesDirectory);
+            chown($this->filesDirectory, $this->user['name']);
+            if (!is_writable($this->filesDirectory)) {
+                throw new Exception('No permission to create path: ' . $this->filesDirectory);
             }
         } else {
-            fwrite(STDERR, 'File directory ' . $this->files_directory . ' exists' . PHP_EOL);
+            fwrite(STDERR, 'File directory ' . $this->filesDirectory . ' exists' . PHP_EOL);
         }
         $images = $document->find("img");
         foreach ($images as $image) {
-            $image_url = $image->getAttribute('src');
-            if (!empty($image_url)) {
-                $content = $this->checkUrl($image_url, $content);
+            $imageUrl = $image->getAttribute('src');
+            if (!empty($imageUrl)) {
+                $content = $this->checkUrl($imageUrl, $content);
             }
         }
         $links = $document->find('link');
         foreach ($links as $link) {
-            $link_href = $link->getAttribute('href');
-            if (!empty($link_href)) {
-                if ($link_href === $this->url_page_path) {
+            $linkHref = $link->getAttribute('href');
+            if (!empty($linkHref)) {
+                if ($linkHref === $this->urlPagePath) {
                     $content = str_replace(
-                        $link_href,
-                        $this->content_url . '_files/' . $this->content_url . '.html',
+                        $linkHref,
+                        $this->contentUrl . '_files/' . $this->contentUrl . '.html',
                         $content);
                 } else {
-                    $content = $this->checkUrl($link_href, $content);
+                    $content = $this->checkUrl($linkHref, $content);
                 }
             }
         }
         $scripts = $document->find("script");
         foreach ($scripts as $script) {
-            $script_url = $script->getAttribute('src');
-            if (!empty($script_url)) {
-                $content = $this->checkUrl($script_url, $content);
+            $scriptUrl = $script->getAttribute('src');
+            if (!empty($scriptUrl)) {
+                $content = $this->checkUrl($scriptUrl, $content);
             }
         }
 
-
         // сохраняем страницу
-        $file_name = $this->content_url . '.html';
-        $path = $this->path . '/' . $file_name;
+        $fileName = $this->contentUrl . '.html';
+        $path = $this->path . '/' . $fileName;
         try {
-            str_replace('" />', '">', $content);
-            str_replace('</html>' . PHP_EOL, '</html>', $content);
             file_put_contents($path, $content);
         } catch (Exception $e) {
             $message = 'Error: ' . $e->getMessage();
@@ -147,14 +138,14 @@ class Loader
     public function checkUrl($url, $content)
     {
         if (
-            stripos($url, $this->url_scheme . '://' . $this->domain_url) === 0
+            stripos($url, $this->urlScheme . '://' . $this->domainUrl) === 0
             && (!substr($url,  -1) != '/')
             && !stripos($url, '@')
         ) {
             if (pathinfo($url, PATHINFO_EXTENSION)) {
-                $url_array = explode('//', $url);
-                if (!empty($url_array[1])) {
-                    $content = $this->saveFile($url_array[1], $content);
+                $urlArray = explode('//', $url);
+                if (!empty($urlArray[1])) {
+                    $content = $this->saveFile($urlArray[1], $content);
                 }
             }
         } elseif (
@@ -181,21 +172,21 @@ class Loader
      */
     public function saveFile($url, $content, string $url_type = 'http'): string
     {
-        $url_to_load = $url_type === 'http' ? $url : $this->domain_url . $url;
-        $replace_url = $this->createPath($url_to_load);
+        $urlToLoad = $url_type === 'http' ? $url : $this->domainUrl . $url;
+        $replaceUrl = $this->createPath($urlToLoad);
         try {
-            $new_url_to_save = $this->files_directory . '/' . $replace_url;
+            $newUrlToSave = $this->filesDirectory . '/' . $replaceUrl;
             try {
-                $this->client->request('GET', $this->url_scheme . '://' . $url_to_load, ['sink' => $new_url_to_save]);
+                $this->client->request('GET', $this->urlScheme . '://' . $urlToLoad, ['sink' => $newUrlToSave]);
             } catch (Exception $e) {
                 if (strpos($e->getMessage(), 'Not found URL')) {
-                    $this->client->request('GET', $this->url . $url, ['sink' => $new_url_to_save]);
+                    $this->client->request('GET', $this->url . $url, ['sink' => $newUrlToSave]);
                 }
             }
 
-            $new_url_to_replace = $this->content_url . '_files' . '/' . $replace_url;
-            $searched_url = $url_type === 'http' ? $this->url_scheme . '://' . $url : $url;
-            $content = str_replace($searched_url, $new_url_to_replace, $content);
+            $newUrlToReplace = $this->contentUrl . '_files' . '/' . $replaceUrl;
+            $searchedUrl = $url_type === 'http' ? $this->urlScheme . '://' . $url : $url;
+            $content = str_replace($searchedUrl, $newUrlToReplace, $content);
         } catch (Exception $e) {
             $this->logger->error('Error: ' . $e->getMessage());
             fwrite(STDERR, 'Error: ' . $e->getMessage() . PHP_EOL);
@@ -208,14 +199,14 @@ class Loader
     public function createPath($url, $type = 'file'): string
     {
         if ($type == 'directory') {
-            $url_array = explode('//', $url);
-            return preg_replace('/[^\w\d\s]/', '-', $url_array[1]);
+            $urlArray = explode('//', $url);
+            return preg_replace('/[^\w\d\s]/', '-', $urlArray[1]);
         } else {
-            $get_extension = explode('.', $url);
-            $extension = $get_extension[count($get_extension) - 1];
-            $removed_extension = substr($url, 0, strlen($url) - strlen($extension) - 1);
-            $new_url = preg_replace('/[^\w\d\s]/', '-', $removed_extension);
-            return $new_url . '.' . $extension;
+            $getExtension = explode('.', $url);
+            $extension = $getExtension[count($getExtension) - 1];
+            $removedExtension = substr($url, 0, strlen($url) - strlen($extension) - 1);
+            $newUrl = preg_replace('/[^\w\d\s]/', '-', $removedExtension);
+            return $newUrl . '.' . $extension;
         }
     }
 }

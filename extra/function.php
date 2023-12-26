@@ -18,11 +18,12 @@ if (! function_exists( 'Downloader\Downloader\downloadPage')) {
      * @throws GuzzleException
      * @throws Exception
      */
-    function downloadPage(string $url, ?string $targetPath, string $clientClass): bool
+    function downloadPage(string $url, ?string $targetPath, ?string $clientClass): bool
     {
 
         $targetDir = $targetPath ?? getcwd();
 
+        $clientClass = !empty($clientClass) ? $clientClass : new Client();
         $params = ['url' => $url, 'path' => $targetDir, 'client' => $clientClass];
         $loader = new Loader($params);
 

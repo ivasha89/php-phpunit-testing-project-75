@@ -1,0 +1,25 @@
+#!/usr/bin/env php
+<?php
+// Путь который будет использован при глобальной установке пакета
+$autoloadPath1 = __DIR__ . '/../../../autoload.php';
+// Путь для локальной работы с проектом
+$autoloadPath2 = __DIR__ . '/../vendor/autoload.php';
+
+if (file_exists($autoloadPath1)) {
+    require_once $autoloadPath1;
+} else {
+    require_once $autoloadPath2;
+}
+
+use DiDom\Exceptions\InvalidSelectorException;
+use GuzzleHttp\Exception\GuzzleException;
+
+use function Downloader\Downloader\downloadPage as hi;
+$url = $argv[1] ?? '';
+$path = $argv[2] ?? '';
+$client = $argv[3] ?? '';
+try {
+    hi($url, $path, $client);
+} catch (InvalidSelectorException|GuzzleException $e) {
+    throw new $e;
+}

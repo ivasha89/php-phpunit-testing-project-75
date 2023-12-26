@@ -3,4 +3,4 @@
 
 
 Демонстрационный проект:
-https://asciinema.org/a/T6FdZseTOMx2iYKLEK6orHdz9
+https://asciinema.org/a/DC9EjwFJgL3gjAKWLOfbfpl5Y
