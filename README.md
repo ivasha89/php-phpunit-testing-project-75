@@ -5,4 +5,4 @@
     ./extra/load url path_to_save
 
 ## Demonstration
-[![asciicast](https://asciinema.org/a/DC9EjwFJgL3gjAKWLOfbfpl5Y.svg)](https://asciinema.org/a/DC9EjwFJgL3gjAKWLOfbfpl5Y)
+[![asciicast](https://asciinema.org/a/630787.svg)](https://asciinema.org/a/630787)
