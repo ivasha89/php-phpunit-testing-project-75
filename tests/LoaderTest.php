@@ -21,8 +21,6 @@ class LoaderTest extends TestCase
 
     private $clientResponse;
 
-    private $root;
-
     /**
      * @return void
      * @throws \PHPUnit\Framework\MockObject\Exception
@@ -32,7 +30,7 @@ class LoaderTest extends TestCase
         vfsStream::setup('var', 0777);
 
         $this->html = '/site-com-blog-about.html';
-        $content = file_get_contents(__DIR__ . $this->html);
+        $content = file_get_contents(__DIR__ . '/fixtures' . $this->html);
 
         $this->client = $this->createMock(Client::class);
         $this->clientResponse = $this->createMock(ResponseInterface::class);
@@ -48,28 +46,28 @@ class LoaderTest extends TestCase
      * @throws GuzzleException
      * @throws InvalidSelectorException
      */
-//    public function testInputUrl()
-//    {
-//        $this->expectException(Exception::class);
-//        $this->expectExceptionMessage('Empty url');
-//        $params = ['url' => '', 'path' => '', 'client' => ''];
-//        $loader = new Loader($params);
-//        $loader->load();
-//    }
-//
-//    /**
-//     * @return void
-//     * @throws GuzzleException
-//     * @throws InvalidSelectorException
-//     */
-//    public function testInputPathParam()
-//    {
-//        $this->expectException(Exception::class);
-//        $this->expectExceptionMessage('Empty path for page saving');
-//        $params = ['url' => 'https://site.com/blog/about', 'path' => '', 'client' => ''];
-//        $loader = new Loader($params);
-//        $loader->load();
-//    }
+    public function testInputUrl()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Empty url');
+        $params = ['url' => '', 'path' => '', 'client' => ''];
+        $loader = new Loader($params);
+        $loader->load();
+    }
+
+    /**
+     * @return void
+     * @throws GuzzleException
+     * @throws InvalidSelectorException
+     */
+    public function testInputPathParam()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Empty path for page saving');
+        $params = ['url' => 'https://site.com/blog/about', 'path' => '', 'client' => ''];
+        $loader = new Loader($params);
+        $loader->load();
+    }
 
     /**
      * @return void
@@ -82,9 +80,7 @@ class LoaderTest extends TestCase
         $url = 'https://site.com/blog/about';
         $directoryPath = vfsStream::url('var');
         $path = $directoryPath . '/tmp';
-//        $user = posix_getpwuid(posix_geteuid());
         mkdir($path);
-//        chown($path, $user['name']);
 
         $this->clientResponse->method('getStatusCode')->willReturn(200);
         $this->client->expects($this->once())->method('get')->with($this->equalTo($url));
@@ -93,36 +89,44 @@ class LoaderTest extends TestCase
         $loader = new Loader($params);
         $loader->load();
 
-        $domDocument = new Document( __DIR__ . $this->html, true);
+        $domDocument = new Document(__DIR__ . '/fixtures' . $this->html, true);
         $this->assertFileExists($path . $this->html);
         $images = $domDocument->find("img");
         $scripts = $domDocument->find("script");
         $files = array_merge($scripts, $images);
         foreach ($files as $file) {
-            $fileUrl = $file->getAttribute('src');
-            if (
-                !empty($fileUrl)
-                && !stripos($fileUrl,'://')
-                && !stripos($fileUrl,'.com')
-                && !stripos($fileUrl,'@')
-            ) {
-                 $this->assertFileExists($path . '/' . $fileUrl);
-            }
+            $this->assertSrcExists($file->getAttribute('src'), $path);
         }
 
         $links = $domDocument->find('link');
         foreach ($links as $link) {
-            $href = $link->getAttribute('href');
-            if (
-                !empty($href) &&
-                pathinfo($href, PATHINFO_EXTENSION)
-                && !(substr($href, -1) !== '/')
-                && !strpos($href, '@')
-                && !strpos($href, 'https')
-            ) {
-                $this->assertFileExists($path . '/' . $href);
-            }
+            $this->assertLinkExists($link->getAttribute('href'), $path);
+        }
+    }
 
+    public function assertSrcExists($fileUrl, $path)
+    {
+        if (
+            pathinfo($fileUrl, PATHINFO_EXTENSION)
+            && !empty($fileUrl)
+            && !stripos($fileUrl, '://')
+            && !stripos($fileUrl, '.com')
+            && !stripos($fileUrl, '@')
+        ) {
+            $this->assertFileExists($path . '/' . $fileUrl);
+        }
+    }
+
+    public function assertLinkExists($href, $path)
+    {
+        if (
+            !empty($href)
+            && pathinfo($href, PATHINFO_EXTENSION)
+            && !(substr($href, -1) !== '/')
+            && !strpos($href, '@')
+            && !strpos($href, 'https')
+        ) {
+            $this->assertFileExists($path . '/' . $href);
         }
     }
 }

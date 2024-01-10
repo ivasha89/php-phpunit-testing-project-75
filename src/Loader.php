@@ -100,7 +100,8 @@ class Loader
                     $content = str_replace(
                         $linkHref,
                         $this->contentUrl . '_files/' . $this->contentUrl . '.html',
-                        $content);
+                        $content
+                    );
                 } else {
                     $content = $this->checkUrl($linkHref, $content);
                 }
@@ -139,7 +140,7 @@ class Loader
     {
         if (
             stripos($url, $this->urlScheme . '://' . $this->domainUrl) === 0
-            && (!substr($url,  -1) != '/')
+            && (!substr($url, -1) != '/')
             && !stripos($url, '@')
         ) {
             if (pathinfo($url, PATHINFO_EXTENSION)) {
@@ -149,9 +150,9 @@ class Loader
                 }
             }
         } elseif (
-            !stripos($url,'://')
-            && !stripos($url,'.com')
-            && !stripos($url,'@')
+            !stripos($url, '://')
+            && !stripos($url, '.com')
+            && !stripos($url, '@')
         ) {
             if (pathinfo($url, PATHINFO_EXTENSION)) {
                 $content = $this->saveFile($url, $content, 'local');

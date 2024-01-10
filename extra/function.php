@@ -8,11 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Hexlet\Code\Loader;
 
-/**
-
-For Hexlet test's needs
- */
-if (! function_exists( 'Downloader\Downloader\downloadPage')) {
+if (!function_exists('Downloader\Downloader\downloadPage')) {
     /**
      * @throws InvalidSelectorException
      * @throws GuzzleException
@@ -28,6 +24,5 @@ if (! function_exists( 'Downloader\Downloader\downloadPage')) {
         $loader = new Loader($params);
 
         return $loader->load();
-
     }
 }
