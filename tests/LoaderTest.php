@@ -109,9 +109,9 @@ class LoaderTest extends TestCase
         if (
             pathinfo($fileUrl, PATHINFO_EXTENSION)
             && !empty($fileUrl)
-            && !stripos($fileUrl, '://')
-            && !stripos($fileUrl, '.com')
-            && !stripos($fileUrl, '@')
+            && !strpos($fileUrl, '://')
+            && !strpos($fileUrl, '.com')
+            && !strpos($fileUrl, '@')
         ) {
             $this->assertFileExists($path . '/' . $fileUrl);
         }
